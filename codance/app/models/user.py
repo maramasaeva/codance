@@ -16,7 +16,7 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-    # Relationships
-    biometric_data = relationship("BiometricData", back_populates="user")
-    song_selections = relationship("SongSelection", back_populates="user")
-    events = relationship("UserEvent", back_populates="user") 
+    # Relationships - Using string references to avoid circular imports
+    biometric_data = relationship("BiometricData", back_populates="user", lazy="dynamic")
+    song_selections = relationship("SongSelection", back_populates="user", lazy="dynamic")
+    events = relationship("UserEvent", back_populates="user", lazy="dynamic") 

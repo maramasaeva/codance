@@ -16,9 +16,9 @@ class SoundEvent(Base):
     duration = Column(Float)  # Duration in seconds
     intensity = Column(Float)
     
-    # Relationships
-    event = relationship("Event", back_populates="sound_events")
-    movement_data = relationship("MovementData", back_populates="sound_events")
+    # Relationships with lazy loading
+    event = relationship("Event", back_populates="sound_events", lazy="joined")
+    movement_data = relationship("MovementData", back_populates="sound_events", lazy="joined")
 
 class SongSelection(Base):
     __tablename__ = "song_selections"
@@ -33,9 +33,9 @@ class SongSelection(Base):
     is_approved = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
-    # Relationships
-    user = relationship("User", back_populates="song_selections")
-    event = relationship("Event", back_populates="song_selections")
+    # Relationships with lazy loading
+    user = relationship("User", back_populates="song_selections", lazy="joined")
+    event = relationship("Event", back_populates="song_selections", lazy="joined")
 
 class SoundSample(Base):
     __tablename__ = "sound_samples"

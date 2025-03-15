@@ -3,6 +3,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 
 from ..core.database import Base
+from .event import DetectedPattern  # Import DetectedPattern from event module
 
 class MovementData(Base):
     __tablename__ = "movement_data"
@@ -17,9 +18,9 @@ class MovementData(Base):
     crowd_density = Column(Float, nullable=True)
     movement_intensity = Column(Float, nullable=True)
     
-    # Relationships
-    event = relationship("Event", back_populates="movement_data")
-    sound_events = relationship("SoundEvent", back_populates="movement_data")
+    # Relationships with lazy loading
+    event = relationship("Event", back_populates="movement_data", lazy="joined")
+    sound_events = relationship("SoundEvent", back_populates="movement_data", lazy="dynamic")
 
 class MovementPattern(Base):
     __tablename__ = "movement_patterns"
@@ -31,5 +32,5 @@ class MovementPattern(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-    # Relationships
-    detected_patterns = relationship("DetectedPattern", back_populates="pattern") 
+    # Relationships with lazy loading
+    detected_patterns = relationship("DetectedPattern", back_populates="pattern", lazy="dynamic") 

@@ -18,9 +18,9 @@ class BiometricData(Base):
     energy_level = Column(Float, nullable=True)  # Calculated energy level
     emotional_state = Column(String, nullable=True)  # Inferred emotional state
     
-    # Relationships
-    user = relationship("User", back_populates="biometric_data")
-    event = relationship("Event", back_populates="biometric_data")
+    # Relationships with lazy loading
+    user = relationship("User", back_populates="biometric_data", lazy="joined")
+    event = relationship("Event", back_populates="biometric_data", lazy="joined")
     
 class BiometricDevice(Base):
     __tablename__ = "biometric_devices"

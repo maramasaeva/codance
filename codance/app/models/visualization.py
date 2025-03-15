@@ -15,8 +15,8 @@ class VisualizationEvent(Base):
     duration = Column(Float)  # Duration in seconds
     intensity = Column(Float)
     
-    # Relationships
-    event = relationship("Event", back_populates="visualization_events")
+    # Relationships with lazy loading
+    event = relationship("Event", back_populates="visualization_events", lazy="joined")
 
 class VisualizationPreset(Base):
     __tablename__ = "visualization_presets"

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any, bytes
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 # Sound Event schemas

@@ -4,55 +4,48 @@ import logging
 
 from .database import SessionLocal, engine, Base
 from .auth import get_password_hash
+
+# Import all models so they're registered with SQLAlchemy
 from ..models.user import User
-from ..models.event import Event
-from ..models.movement import MovementPattern
-from ..models.sound import SoundPreset
-from ..models.visualization import VisualizationPreset
+from ..models.biometrics import BiometricData, BiometricDevice
+from ..models.event import Event, UserEvent, DetectedPattern
+from ..models.movement import MovementData, MovementPattern
+from ..models.sound import SoundEvent, SongSelection, SoundSample, SoundPreset
+from ..models.visualization import VisualizationEvent, VisualizationPreset
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def init_db():
     """Initialize the database with some sample data."""
-    Base.metadata.create_all(bind=engine)
+    logger.info("Creating database tables...")
+    try:
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database tables created successfully.")
+    except Exception as e:
+        logger.error(f"Error creating database tables: {e}")
+        raise
     
-    db = SessionLocal()
-    
-    # Check if we already have users
-    user_count = db.query(User).count()
-    if user_count == 0:
-        logger.info("Creating initial admin user...")
-        create_initial_admin(db)
-    
-    # Check if we have any events
-    event_count = db.query(Event).count()
-    if event_count == 0:
-        logger.info("Creating sample events...")
-        create_sample_events(db)
-    
-    # Check if we have any movement patterns
-    pattern_count = db.query(MovementPattern).count()
-    if pattern_count == 0:
-        logger.info("Creating sample movement patterns...")
-        create_sample_movement_patterns(db)
-    
-    # Check if we have any sound presets
-    sound_preset_count = db.query(SoundPreset).count()
-    if sound_preset_count == 0:
-        logger.info("Creating sample sound presets...")
-        create_sample_sound_presets(db)
-    
-    # Check if we have any visualization presets
-    viz_preset_count = db.query(VisualizationPreset).count()
-    if viz_preset_count == 0:
-        logger.info("Creating sample visualization presets...")
-        create_sample_visualization_presets(db)
-    
-    db.close()
+    # Simple check to make sure we can connect to the database
+    try:
+        db = SessionLocal()
+        logger.info("Database connection established successfully.")
+        
+        # Check if there are any admin users
+        admin_exists = db.query(User).filter(User.is_admin == True).first() is not None
+        if not admin_exists:
+            logger.info("No admin user found. Creating initial admin...")
+            create_initial_admin(db)
+            logger.info("Initial admin user created.")
+        
+        db.close()
+        logger.info("Database connection closed.")
+    except Exception as e:
+        logger.error(f"Error connecting to database: {e}")
+        raise
 
 def create_initial_admin(db: Session):
-    """Create an initial admin user."""
+    """Create the initial admin user if none exists."""
     hashed_password = get_password_hash("admin123")
     admin_user = User(
         email="admin@codance.com",
@@ -63,7 +56,6 @@ def create_initial_admin(db: Session):
     )
     db.add(admin_user)
     db.commit()
-    logger.info("Admin user created with username 'admin' and password 'admin123'")
 
 def create_sample_events(db: Session):
     """Create sample events."""
